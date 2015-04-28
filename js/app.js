@@ -30,13 +30,13 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     this.sprite = 'images/char-boy.png';
-    this.x = 50;
-    this.y = 50;
+    this.x = 200;
+    this.y = (83 * 5) - 20;
 }
 
 Player.prototype.update = function(dt) {
-    //TODO: translate inputs to movement
-    this.loc + 0;
+    //clamp x between -2 and 402;
+    //this.x = Math.min(Math.max(this.x, -2), 402);
 }
 
 Player.prototype.render = function() {
@@ -45,7 +45,17 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
     //TODO: translate key presses into directional movement
-    console.log(key);
+    if (key === "left"){
+        ((this.x === -2) ? null : this.x -= 101);
+    } else if (key === "up") {
+        ((this.y === -20) ? null : this.y -= 83);
+    } else if (key === "right") {
+        ((this.x === 402) ? null : this.x += 101);
+    } else if (key === "down") {
+        ((this.y === 395) ? null : this.y += 83);
+    }        
+    
+
     //Player.update(move);
 }
 // Now instantiate your objects.
