@@ -1,11 +1,19 @@
 // Enemies our player must avoid
-var Enemy = function() {
+var Enemy = function(row, offset) {
+    /*  param: row      | int [1-3]     | cobblestone tile 
+        row to birth enemy object
+
+        param: offset   |   int         | x-offset birth 
+        position
+    */
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
+    this.x = offset;
+    this.y = (83 * row) -20;
 }
 
 // Update the enemy's position, required method for game
@@ -14,8 +22,10 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+    
     //console.log("update enemy");
-    this.loc + 0;
+    //console.log(dt);
+    this.x += (200*dt);
 
 
 }
@@ -62,8 +72,8 @@ Player.prototype.handleInput = function(key) {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var player = new Player();
-var bug1 = new Enemy();
-var bug2 = new Enemy();
+var bug1 = new Enemy(2, -200);
+var bug2 = new Enemy(3, -400);
 var allEnemies = [bug1, bug2];
 
 
