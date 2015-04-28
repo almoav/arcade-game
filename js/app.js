@@ -6,7 +6,6 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.loc = 0;
 }
 
 // Update the enemy's position, required method for game
@@ -15,7 +14,8 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.loc + (2 * dt);
+    //console.log("update enemy");
+    this.loc + 0;
 
 
 }
@@ -44,11 +44,16 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
     //TODO: translate key presses into directional movement
-    Player.update(move);
+    console.log(key);
+    //Player.update(move);
 }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
+var player = new Player();
+var bug1 = new Enemy();
+var bug2 = new Enemy();
+var allEnemies = [bug1, bug2];
 
 
 
@@ -61,6 +66,6 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-
+    
     Player.handleInput(allowedKeys[e.keyCode]);
 });
