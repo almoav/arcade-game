@@ -30,7 +30,8 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 var Player = function() {
     this.sprite = 'images/char-boy.png';
-    this.loc = 0;
+    this.x = 50;
+    this.y = 50;
 }
 
 Player.prototype.update = function(dt) {
@@ -66,6 +67,6 @@ document.addEventListener('keyup', function(e) {
         39: 'right',
         40: 'down'
     };
-    
-    Player.handleInput(allowedKeys[e.keyCode]);
+
+    player.handleInput(allowedKeys[e.keyCode]);
 });
