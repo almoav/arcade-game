@@ -82,7 +82,16 @@ var Engine = (function(global) {
         updateEntities(dt);
         // checkCollisions();
     }
-
+    /*
+    function checkCollisons();
+         allEnemies.forEach(function(enemy) {
+            if (enemy.y === player.y) {
+                //console.log(player.x/this.x);
+                if (Math.abs(player.x-enemy.x) < 60) {
+                    console.log("collide");    
+        }
+        });       
+    */
     /* This is called by the update function  and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
      * their update() methods. It will then call the update function for your
@@ -160,7 +169,7 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        // noop
+        console.log("reset");
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -181,4 +190,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+
 })(this);

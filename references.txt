@@ -1,0 +1,8 @@
+http://stackoverflow.com/questions/801032/why-is-null-an-object-and-whats-the-difference-between-null-and-undefined
+
+http://stackoverflow.com/questions/424292/seedable-javascript-random-number-generator
+
+http://www.w3schools.com/jsref/jsref_abs.asp
+
+http://blog.kevinchisholm.com/javascript/javascript-immediate-functions-basics/
+http://kakimotonline.com/2011/05/17/javascript-immetiate-object-initialization/
