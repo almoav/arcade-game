@@ -12,7 +12,7 @@ var Enemy = function() {
 Enemy.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.speed = (Math.random() + .5) * 200;
-    this.x = Math.random() * -1000;
+    this.x = (Math.random() * -500) - 50;
     this.y = (83 * this.row) -10;    
 }
 
@@ -22,11 +22,13 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers. 
+    this.x += (this.speed*dt);
+
     if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
-        console.log("collide");
+        console.log("wasted");
         resetLevel();
-    } else {
-        this.x += (this.speed*dt);
+    } else if (this.x > 450) {
+        this.reset();
     }
 }
 
@@ -52,8 +54,11 @@ Player.prototype.reset = function() {
 
 
 Player.prototype.update = function(dt) {
-    //clamp x between -2 and 402;
-    //this.x = Math.min(Math.max(this.x, -2), 402);
+    if (this.y < 0) {
+        console.log("level beaten");
+        nextLevel();
+        resetLevel();
+    }
 }
 
 
@@ -76,22 +81,35 @@ Player.prototype.handleInput = function(key) {
     }        
 }
 
+// level stuff
+
 var resetLevel = function() {
+    // convenience function for resetting enemies and player 
+    // simultaneously
     player.reset()
     for (enemy in allEnemies) {
         allEnemies[enemy].reset();
     }
 }
 
+var nextLevel = function() {
+    // increment the number of enemies
+    level++;
+    console.log("level ", level);
+    bug = new Enemy();
+    allEnemies.push(bug);
+    console.log(allEnemies);
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var player = new Player();
-var bug1 = new Enemy();
-var bug2 = new Enemy();
-var bug3 = new Enemy();
-var allEnemies = [bug1, bug2, bug3];
+//var bug1 = new Enemy();
+//var bug2 = new Enemy();
+//var bug3 = new Enemy();
+var level = 1;
+var allEnemies = [new Enemy(), new Enemy(), new Enemy()];
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
