@@ -6,17 +6,14 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.row = Math.max(Math.round(Math.random() * 3), 1);
-    this.speed = (Math.random() + .5) * 200;
-    this.x = (Math.random() * 450) - 50;
-    this.y = (83 * this.row) -10;
+    this.reset();
 }
 
 Enemy.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.speed = (Math.random() + .5) * 200;
-    this.x = (Math.random() * -500) - 50;
-    this.y = (83 * this.row) -10;    
+    this.x = (Math.random() * 500) - 150;
+    this.y = (83 * this.row) -10; 
 }
 
 // Update the enemy's position, required method for game
@@ -25,16 +22,29 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers. 
+    //console.log(dt);
+    
+
     this.x += (this.speed*dt);
 
     if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
-        console.log("wasted");
-        resetLevel();
+        player.lives -= 1;
+        if (player.lives > 0) {
+            console.log("wasted. lives remaining: %".replace("%", player.lives));
+            resetLevel();            
+        }  else {
+            //TODO reset game
+            console.log("game over.")
+            resetGame();
+        }
+
     } else if (this.x > 500) {
-        this.reset();
+        //wrap the enemy around to start
+        this.x = (Math.random() * -450) - 50;
+        this.row = Math.max(Math.round(Math.random() * 3), 1);
+        this.y = (83 * this.row) -10;
     }
 }
-
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
@@ -46,17 +56,17 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
+    this.lives = 3;
+    this.sprite = 'images/char-boy.png';
     this.reset()
 }
 
 Player.prototype.reset = function() {
-    this.sprite = 'images/char-boy.png';
     this.x = 200;
     this.y = (83 * 5) - 10;    
 }
 
-
-Player.prototype.update = function(dt) {
+Player.prototype.update = function() {
     if (this.y < 0) {
         //console.log("level beaten");
         nextLevel();
@@ -64,11 +74,9 @@ Player.prototype.update = function(dt) {
     }
 }
 
-
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);    
 }
-
 
 Player.prototype.handleInput = function(key) {
     // takes player input and translates into player position
@@ -85,8 +93,21 @@ Player.prototype.handleInput = function(key) {
     //console.log(this.x, this.y);
 }
 
-// level stuff
 
+
+// Now instantiate your objects.
+// Place all enemy objects in an array called allEnemies
+// Place the player object in a variable called player
+var player = {}, level = 0, allEnemies = [];
+
+var resetGame = function() {
+    player = new Player();
+    level = 1;
+    allEnemies = [new Enemy(), new Enemy(), new Enemy()];
+    console.log("level %".replace("%", level));
+}
+
+// level stuff
 var resetLevel = function() {
     // convenience function for resetting enemies and player 
     // simultaneously
@@ -99,20 +120,12 @@ var resetLevel = function() {
 var nextLevel = function() {
     // increment the number of enemies
     level++;
-    console.log("level ", level);
+    console.log("level %".replace("%", level));
     bug = new Enemy();
     allEnemies.push(bug);
 }
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-var player = new Player();
-//var bug1 = new Enemy();
-//var bug2 = new Enemy();
-//var bug3 = new Enemy();
-var level = 1;
-var allEnemies = [new Enemy(), new Enemy(), new Enemy()];
+resetGame();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
