@@ -89,19 +89,69 @@ Player.prototype.handleInput = function(key) {
     } else if (key === "down") {
         ((this.y === 405) ? null : this.y += 83);
     }        
+}
 
-    //console.log(this.x, this.y);
+
+var Message = function() {
+    //used for storing and displaying messages to the canvas
+    //message storage/input
+    this.msg = "new";
+    this.reset();
+}
+
+Message.prototype.update = function() {
+    //Does nothing
+}
+
+
+Message.prototype.reset = function(msg) {
+    this.start = Date.now();
+    this.count = 10;
+    this.msg = msg;
+}
+ 
+Message.prototype.render = function() {
+    //display render message to canvas
+    //need to track length of message display and microseconds 
+    //since dislpay start
+    var len = 1500.0;
+    var ms = Date.now() - this.start;
+    var alpha = 1.0;
+    var Cr = 255;
+    if (ms < len) {
+        //console.log(ms);
+        // fade alpha over length of display
+        alpha = (len - ms)/len;
+        //fade color over time
+        Cr *= alpha;
+        console.log("$,$,$".replace(/[$]/g, Cr));
+        ctx.fillStyle = "rgba(255,255,255,%)".replace("%", alpha);
+        ctx.strokeStyle = "rgba(0,120,0,%)".replace("%", alpha);
+        ctx.fillText(this.msg, 250, 275);
+        ctx.strokeText(this.msg, 250, 275);
+    }
+    message.count--;
 }
 
 
 
+var Clock = function() {
+    this.start = Date.now();
+}
+
+Clock.prototype.timestep = function(dt) {
+    //Does nothing
+}
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player = {}, level = 0, allEnemies = [];
+var player, level, allEnemies, clock, message;
 
 var resetGame = function() {
     player = new Player();
+    clock = new Clock();
+    message = new Message();
     level = 1;
     allEnemies = [new Enemy(), new Enemy(), new Enemy()];
     console.log("level %".replace("%", level));
@@ -118,11 +168,20 @@ var resetLevel = function() {
 }
 
 var nextLevel = function() {
-    // increment the number of enemies
+    // handles level progression
     level++;
-    console.log("level %".replace("%", level));
+    //console.log("level %".replace("%", level));
+    message.reset("level %".replace("%", level));
+    
+    // increment the number of enemies
     bug = new Enemy();
     allEnemies.push(bug);
+
+    // bonus life every 10 levels
+    if (level % 10 === 0) {
+        player.lives++;
+        console.log("+1, lives remaining: %".replace("%", player.lives));
+    }
 }
 
 resetGame();

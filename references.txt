@@ -6,3 +6,5 @@ http://www.w3schools.com/jsref/jsref_abs.asp
 
 http://blog.kevinchisholm.com/javascript/javascript-immediate-functions-basics/
 http://kakimotonline.com/2011/05/17/javascript-immetiate-object-initialization/
+
+http://stackoverflow.com/questions/16576983/replace-multiple-characters-in-one-replace-call

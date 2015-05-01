@@ -29,6 +29,12 @@ var Engine = (function(global) {
     canvas.height = 606;
     doc.body.appendChild(canvas);
 
+    //ctx.fillStyle = "white";
+    //ctx.strokeStyle = "black";
+    ctx.lineWidth = 3;
+    ctx.font = "bold 36pt impact";
+    ctx.textAlign = "center";
+
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
@@ -80,6 +86,10 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
+        
+        // count the current frame
+        clock.timestep(dt);
+
         // checkCollisions();
     }
     /*
@@ -104,6 +114,7 @@ var Engine = (function(global) {
             enemy.update(dt);
         });
         player.update();
+        message.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -162,6 +173,7 @@ var Engine = (function(global) {
         });
 
         player.render();
+        message.render();
     }
 
     /* This function does nothing but it could have been a good place to
