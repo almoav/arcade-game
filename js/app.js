@@ -6,7 +6,10 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.reset();
+    this.row = Math.max(Math.round(Math.random() * 3), 1);
+    this.speed = (Math.random() + .5) * 200;
+    this.x = (Math.random() * 450) - 50;
+    this.y = (83 * this.row) -10;
 }
 
 Enemy.prototype.reset = function() {
@@ -27,7 +30,7 @@ Enemy.prototype.update = function(dt) {
     if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
         console.log("wasted");
         resetLevel();
-    } else if (this.x > 450) {
+    } else if (this.x > 500) {
         this.reset();
     }
 }
@@ -55,7 +58,7 @@ Player.prototype.reset = function() {
 
 Player.prototype.update = function(dt) {
     if (this.y < 0) {
-        console.log("level beaten");
+        //console.log("level beaten");
         nextLevel();
         resetLevel();
     }
@@ -68,8 +71,7 @@ Player.prototype.render = function() {
 
 
 Player.prototype.handleInput = function(key) {
-    //TODO: translate key presses into directional movement
-    //console.log(this.x, this.y);
+    // takes player input and translates into player position
     if (key === "left"){
         ((this.x === -2) ? null : this.x -= 101);
     } else if (key === "up") {
@@ -79,6 +81,8 @@ Player.prototype.handleInput = function(key) {
     } else if (key === "down") {
         ((this.y === 405) ? null : this.y += 83);
     }        
+
+    //console.log(this.x, this.y);
 }
 
 // level stuff
@@ -98,7 +102,6 @@ var nextLevel = function() {
     console.log("level ", level);
     bug = new Enemy();
     allEnemies.push(bug);
-    console.log(allEnemies);
 }
 
 // Now instantiate your objects.
