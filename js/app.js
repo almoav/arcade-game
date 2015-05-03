@@ -30,12 +30,16 @@ Enemy.prototype.update = function(dt) {
     if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
         player.lives -= 1;
         if (player.lives > 0) {
-            console.log("wasted. lives remaining: %".replace("%", player.lives));
+            //console.log("wasted. lives remaining: %".replace("%", player.lives));
+            message.reset("wasted", "death");
             resetLevel();            
         }  else {
             //TODO reset game
-            console.log("game over.")
-            resetGame();
+            message.reset("game over", "end");
+            //setTimeout(function(){message.reset("game over");}, 1000);
+            player.reset();
+            setTimeout(resetGame, 1500);
+            //resetGame();
         }
 
     } else if (this.x > 500) {
@@ -59,15 +63,18 @@ var Player = function() {
     this.lives = 3;
     this.sprite = 'images/char-boy.png';
     this.reset()
+    this.move = true;
 }
 
 Player.prototype.reset = function() {
+    //place player back at start position
     this.x = 200;
     this.y = (83 * 5) - 10;    
 }
 
 Player.prototype.update = function() {
     if (this.y < 0) {
+        //do when player reaches water tiles
         //console.log("level beaten");
         nextLevel();
         resetLevel();
@@ -80,23 +87,26 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
     // takes player input and translates into player position
-    if (key === "left"){
-        ((this.x === -2) ? null : this.x -= 101);
-    } else if (key === "up") {
-        ((this.y === -10) ? null : this.y -= 83);
-    } else if (key === "right") {
-        ((this.x === 402) ? null : this.x += 101);
-    } else if (key === "down") {
-        ((this.y === 405) ? null : this.y += 83);
-    }        
+    // only if move attribute is set to true
+    if (this.move === true) {
+        if (key === "left"){
+            ((this.x === -2) ? null : this.x -= 101);
+        } else if (key === "up") {
+            ((this.y === -10) ? null : this.y -= 83);
+        } else if (key === "right") {
+            ((this.x === 402) ? null : this.x += 101);
+        } else if (key === "down") {
+            ((this.y === 405) ? null : this.y += 83);
+        }        
+    }
+        
 }
 
 
 var Message = function() {
     //used for storing and displaying messages to the canvas
-    //message storage/input
     this.msg = "new";
-    this.reset();
+    this.reset("new game", "regular");
 }
 
 Message.prototype.update = function() {
@@ -104,10 +114,12 @@ Message.prototype.update = function() {
 }
 
 
-Message.prototype.reset = function(msg) {
+Message.prototype.reset = function(msg, msgtype) {
+    //starts a new message
     this.start = Date.now();
     this.count = 10;
     this.msg = msg;
+    this.msgtype = msgtype;
 }
  
 Message.prototype.render = function() {
@@ -118,21 +130,42 @@ Message.prototype.render = function() {
     var ms = Date.now() - this.start;
     var alpha = 1.0;
     var Cr = 255;
+    var fill = "rgba(#,#,#,%)";
+    var bkgfill = "rgba(20,20,20,%)";
     if (ms < len) {
-        //console.log(ms);
         // fade alpha over length of display
         alpha = (len - ms)/len;
+        fill = fill.replace("%", alpha);
+        bkgfill = bkgfill.replace("%", alpha);
+
         //fade color over time
-        Cr *= alpha;
-        console.log("$,$,$".replace(/[$]/g, Cr));
-        ctx.fillStyle = "rgba(255,255,255,%)".replace("%", alpha);
-        ctx.strokeStyle = "rgba(0,120,0,%)".replace("%", alpha);
+        Cr = parseInt(Cr * alpha * 1.5);
+        fill = fill.replace(/[#]/g, Cr);
+        
+        //fill = fill.replace(/[$]/g, 255);
+        
+
+        
+        
+        //switch stroke color for different message types
+        if (this.msgtype === "regular") {
+            ctx.strokeStyle = "rgba(0,120,0,%)".replace("%", alpha);            
+        } else {
+            player.move = false;
+            ctx.fillStyle = bkgfill;    
+            ctx.fillRect(0,0,505,606);
+            ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
+        }
+        
+        ctx.fillStyle = fill;
         ctx.fillText(this.msg, 250, 275);
         ctx.strokeText(this.msg, 250, 275);
+        
+    } else {
+        player.move = true;
     }
     message.count--;
 }
-
 
 
 var Clock = function() {
@@ -148,13 +181,17 @@ Clock.prototype.timestep = function(dt) {
 // Place the player object in a variable called player
 var player, level, allEnemies, clock, message;
 
+message = new Message();
+clock = new Clock();
+
 var resetGame = function() {
     player = new Player();
-    clock = new Clock();
-    message = new Message();
+    //clock = new Clock();
+    //message = new Message();
     level = 1;
     allEnemies = [new Enemy(), new Enemy(), new Enemy()];
-    console.log("level %".replace("%", level));
+    //console.log("level %".replace("%", level));
+    message.reset("level %".replace("%", level), "regular");
 }
 
 // level stuff
@@ -171,7 +208,7 @@ var nextLevel = function() {
     // handles level progression
     level++;
     //console.log("level %".replace("%", level));
-    message.reset("level %".replace("%", level));
+    message.reset("level %".replace("%", level), "regular");
     
     // increment the number of enemies
     bug = new Enemy();
@@ -180,7 +217,8 @@ var nextLevel = function() {
     // bonus life every 10 levels
     if (level % 10 === 0) {
         player.lives++;
-        console.log("+1, lives remaining: %".replace("%", player.lives));
+        //console.log("+1, lives remaining: %".replace("%", player.lives));
+        message.reset("+1", "regular");
     }
 }
 
