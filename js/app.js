@@ -29,12 +29,15 @@ Enemy.prototype.update = function(dt) {
         this.x += (dt * this.speed);
     }
     detectCollision(this);
+    if (this.x > 500) {
+        this.wrap();
+    }
 }
 
 Enemy.prototype.wrap = function() {
-    if (this.x > 500) {
-        
-    }
+    this.x = (Math.random() * -450) - 50;
+    this.row = Math.max(Math.round(Math.random() * 3), 1);
+    this.y = (83 * this.row) -36;
 }
 
 // Draw the enemy on the screen, required method for game
@@ -44,14 +47,25 @@ Enemy.prototype.render = function() {
 
 var Heart = function() {
     //heart item player interacts with
+    Enemy.call(this);
     this.type = "heart";
     this.sprite = 'images/Heart.png';
-    //this.x = -50;
-    //this.y = 0*83 - 36;
+    this.x = -500;
     this.speed = 200;
 }
+Heart.prototype = Object.create(Enemy.prototype);
+Heart.prototype.constructor = Heart;
 
+Heart.prototype.render = function() {
+    scale = 100;
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 72, scale);
+    
+}
 
+Heart.prototype.wrap = function() {
+    this.move = false;
+    allItems.pop();
+}
 
 
 // Now write your own player class
@@ -95,7 +109,7 @@ Player.prototype.handleInput = function(key) {
         } else if (key === "right") {
             ((this.x === 402) ? null : this.x += 101);
         } else if (key === "down") {
-            ((this.y === 405) ? null : this.y += 83);
+            ((this.y === 379) ? null : this.y += 83);
         }        
     }
         
@@ -123,9 +137,9 @@ Selector.prototype.constructor = Selector;
 
 Selector.prototype.handleInput = function(key) {
     if (key === "left"){
-        ((this.x === -2) ? null : this.x -= 101);
+        ((this.x === 0) ? null : this.x -= 101);
     } else if (key === "right") {
-        ((this.x === 402) ? null : this.x += 101);
+        ((this.x === 404) ? null : this.x += 101);
     } else if (key === "enter") {
         select =  this.x/101;
         player.sprite = this.charImages[select];
@@ -133,7 +147,6 @@ Selector.prototype.handleInput = function(key) {
 
     }
 }
-
 
 var Message = function() {
     //used for storing and displaying messages to the canvas
@@ -163,6 +176,7 @@ Message.prototype.render = function() {
     var bkgfill = "rgba(20,20,20,%)";
     if (ms < len) {
         // fade alpha over length of display
+        
         alpha = (len - ms)/len;
         fill = fill.replace("%", alpha);
         bkgfill = bkgfill.replace("%", alpha);
@@ -188,22 +202,51 @@ Message.prototype.render = function() {
         ctx.strokeText(this.msg, 250, 275);
         
     } else {
-        player.move = true;
+        player.move = true;   
     }
     message.count--;
+
 }
 
+var Events = function() {
+    //set start time when game starts
+    this.start = 0;
+    this.gameElapsed = 0;
+    //heart item genration count down
+    this.heartCD = 1000;
+}
+
+Events.prototype.update = function() {
+    this.gameElapsed = Date.now() - this.start;
+    if (level > 5) {
+        this.genHeart();    
+    }
+    
+}
+
+Events.prototype.genHeart = function() {
+    if (this.heartCD <= 0) {
+        console.log("gen heart");
+        heart = new Heart();
+        allItems.push(heart);
+        this.heartCD = 1000;
+    }   
+    this.heartCD--; 
+    //console.log(this.heartCD);
+
+}
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player, level, allEnemies, allItems, message, gameStatus, selector;
+var player, level, allEnemies, allItems, message, events, gameStatus, selector;
 
 message = new Message();
 
 var resetGame = function() {
     player = new Player();
     selector = new Selector();
+    events = new Events();
     level = 0;
     allEnemies = [new Enemy(), new Enemy()];
     allItems = [];
@@ -212,6 +255,7 @@ var resetGame = function() {
 
 var startGame = function() {
     gameStatus = "run";
+    events.start = Date.now();
     nextLevel();
 }
 
@@ -238,17 +282,17 @@ var nextLevel = function() {
     // bonus life every 10 levels
     if (level % 10 === 0) {
         player.lives++;
-        message.reset("+1", "regular");
+        message.reset("level %, +1".replace("%", level), "regular");
     }
 }
 
 var detectCollision = function(obj) {
     //container for actions executed with player collisions
     //param: object invoking this method
-    if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
+    if (obj.y === player.y && Math.abs(player.x-obj.x) < 60) {
         //object has collided
         if (obj.type === "enemy") {
-            player.lives -= 1;
+            player.lives--;
             if (player.lives > 0) {
                 message.reset("wasted", "death");
                 resetLevel();            
@@ -258,7 +302,9 @@ var detectCollision = function(obj) {
                 player.reset();
                 setTimeout(resetGame, 2000);
             }        
-        } else {
+        } else if (obj.type === "heart") {
+            player.lives++
+            obj.wrap();
             //TODO collide with other objects
         }
     }    
@@ -280,3 +326,5 @@ document.addEventListener('keyup', function(e) {
     player.handleInput(allowedKeys[e.keyCode]);
     selector.handleInput(allowedKeys[e.keyCode]);
 });
+
+

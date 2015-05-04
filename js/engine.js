@@ -117,6 +117,7 @@ var Engine = (function(global) {
         });
         player.update();
         message.update();
+        events.update();
     }
 
     /* This function initially draws the "game level", it will then call
@@ -159,8 +160,14 @@ var Engine = (function(global) {
                     ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
                 }
             }
+            ctx.drawImage(Resources.get(player.sprite), 0, 5, 30, 50)
+            for (i=0; i < player.lives; i++) {
+                ctx.drawImage(Resources.get('images/Heart.png'), (i+1) * 28, 15, 25, 40)
+            }
+
             renderEntities();          
         } else {
+            // start menu
             //fill bkg with grass
             for (row = 0; row < numRows; row++) {
                 for (col = 0; col < numCols; col++) {
@@ -199,6 +206,10 @@ var Engine = (function(global) {
             enemy.render();
         });
 
+        allItems.forEach(function(item) {
+            item.render();
+        });
+
         player.render();
         message.render();
     }
@@ -235,5 +246,6 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.canvas = canvas;
 
 })(this);
