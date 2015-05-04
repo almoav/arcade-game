@@ -5,7 +5,9 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
+    this.type = "enemy";
     this.sprite = 'images/enemy-bug.png';
+    this.move = true;
     this.reset();
 }
 
@@ -13,7 +15,8 @@ Enemy.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.speed = (Math.random() + .5) * 200;
     this.x = (Math.random() * 500) - 150;
-    this.y = (83 * this.row) -36; 
+    this.y = (83 * this.row) -36;
+    this.move = true; 
 }
 
 // Update the enemy's position, required method for game
@@ -22,29 +25,15 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers. 
-    this.x += (this.speed*dt);
+    if (this.move === true) {
+        this.x += (dt * this.speed);
+    }
+    detectCollision(this);
+}
 
-    //collision detection
-    if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
-        player.lives -= 1;
-        if (player.lives > 0) {
-            //console.log("wasted. lives remaining: %".replace("%", player.lives));
-            message.reset("wasted", "death");
-            resetLevel();            
-        }  else {
-            //TODO reset game
-            message.reset("game over", "end");
-            //setTimeout(function(){message.reset("game over");}, 1000);
-            player.reset();
-            setTimeout(resetGame, 2000);
-            //resetGame();
-        }
-
-    } else if (this.x > 500) {
-        //wrap the enemy around to start
-        this.x = (Math.random() * -450) - 50;
-        this.row = Math.max(Math.round(Math.random() * 3), 1);
-        this.y = (83 * this.row) -36;
+Enemy.prototype.wrap = function() {
+    if (this.x > 500) {
+        
     }
 }
 
@@ -53,11 +42,23 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
+var Heart = function() {
+    //heart item player interacts with
+    this.type = "heart";
+    this.sprite = 'images/Heart.png';
+    //this.x = -50;
+    //this.y = 0*83 - 36;
+    this.speed = 200;
+}
+
+
+
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
+    this.type = "player";
     this.lives = 3;
     this.sprite = 'images/char-boy.png';
     this.reset()
@@ -104,6 +105,7 @@ var Selector = function() {
     //subclass of player used in start screen to select
     //character sprite
     Player.call(this);
+    this.type = "selector";
     this.sprite = 'images/Selector.png';
     this.x = 0;
     this.y = 83*3-36;
@@ -116,8 +118,8 @@ var Selector = function() {
         ];
 
 }
-
 Selector.prototype = Object.create(Player.prototype);
+Selector.prototype.constructor = Selector;
 
 Selector.prototype.handleInput = function(key) {
     if (key === "left"){
@@ -125,9 +127,7 @@ Selector.prototype.handleInput = function(key) {
     } else if (key === "right") {
         ((this.x === 402) ? null : this.x += 101);
     } else if (key === "enter") {
-        //console.log("start" );
         select =  this.x/101;
-        //console.log(this.charImages[select]);
         player.sprite = this.charImages[select];
         startGame();
 
@@ -144,7 +144,6 @@ var Message = function() {
 Message.prototype.update = function() {
     //Does nothing
 }
-
 
 Message.prototype.reset = function(msg, msgtype) {
     //starts a new message
@@ -195,31 +194,20 @@ Message.prototype.render = function() {
 }
 
 
-var Clock = function() {
-    this.start = Date.now();
-}
-
-Clock.prototype.timestep = function(dt) {
-    //Does nothing
-}
-
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player, level, allEnemies, clock, message, gameStatus, selector;
+var player, level, allEnemies, allItems, message, gameStatus, selector;
 
 message = new Message();
-//clock = new Clock();
 
 var resetGame = function() {
     player = new Player();
     selector = new Selector();
-    //clock = new Clock();
-    //message = new Message();
     level = 0;
     allEnemies = [new Enemy(), new Enemy()];
+    allItems = [];
     gameStatus = "start";
-    //message.reset("level %".replace("%", level), "regular");
 }
 
 var startGame = function() {
@@ -241,7 +229,6 @@ var nextLevel = function() {
     resetLevel();
     // handles level progression
     level++;
-    //console.log("level %".replace("%", level));
     message.reset("level %".replace("%", level), "regular");
     
     // increment the number of enemies
@@ -251,13 +238,30 @@ var nextLevel = function() {
     // bonus life every 10 levels
     if (level % 10 === 0) {
         player.lives++;
-        //console.log("+1, lives remaining: %".replace("%", player.lives));
         message.reset("+1", "regular");
     }
 }
 
-var collision = function() {
+var detectCollision = function(obj) {
     //container for actions executed with player collisions
+    //param: object invoking this method
+    if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
+        //object has collided
+        if (obj.type === "enemy") {
+            player.lives -= 1;
+            if (player.lives > 0) {
+                message.reset("wasted", "death");
+                resetLevel();            
+            }  else {
+                //if player lives less than 1 game is over
+                message.reset("game over", "end");
+                player.reset();
+                setTimeout(resetGame, 2000);
+            }        
+        } else {
+            //TODO collide with other objects
+        }
+    }    
 }
 
 resetGame();

@@ -89,7 +89,6 @@ var Engine = (function(global) {
         
         // count the current frame
         //clock.timestep(dt);
-
         // checkCollisions();
     }
     /*
@@ -112,6 +111,9 @@ var Engine = (function(global) {
     function updateEntities(dt) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
+        });
+        allItems.forEach(function(item) {
+            item.update(dt);
         });
         player.update();
         message.update();
@@ -140,15 +142,6 @@ var Engine = (function(global) {
                 'images/grass-block.png',   // Row 1 of 2 of grass
                 'images/grass-block.png'    // Row 2 of 2 of grass
             ], 
-            /*
-            charImages = [
-                'images/char-boy.png',
-                'images/char-cat-girl.png',
-                'images/char-horn-girl.png',
-                'images/char-pink-girl.png',
-                'images/char-princess-girl.png'
-            ],
-            */
             charImages = selector.charImages,
             numRows = 6,
             numCols = 5,
@@ -232,7 +225,8 @@ var Engine = (function(global) {
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
         'images/char-princess-girl.png',
-        'images/Selector.png'
+        'images/Selector.png',
+        'images/Heart.png'
     ]);
     Resources.onReady(init);
 
