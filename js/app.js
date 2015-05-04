@@ -89,6 +89,7 @@ Player.prototype.update = function() {
     if (this.y < 0) {
         //do when player reaches water tiles
         //console.log("level beaten");
+        gameScore += (100 * gameLevel * gameMultiply);
         nextLevel();
         resetLevel();
     }
@@ -210,18 +211,34 @@ Message.prototype.render = function() {
 
 var Events = function() {
     //set start time when game starts
-    this.start = 0;
+    this.gameStart = 0;
+    this.levelStart = 0;
     this.gameElapsed = 0;
+    this.levelElapsed = 0;
     //heart item genration count down
     this.heartCD = 1000;
+    this.multCD = 100;
 }
 
-Events.prototype.update = function() {
-    this.gameElapsed = Date.now() - this.start;
-    if (level > 5) {
-        this.genHeart();    
+Events.prototype.update = function(dt) {
+    this.gameElapsed = Date.now() - this.gameStart;
+    this.levelElapsed = Date.now() - this.levelStart;
+    //decrease the score multiplier by a factor of delta time
+    //gameMultiply = gameMultiply - Math.round(50 * dt)/200;
+    //setInterval(function() {gameMultiply -= 0.25}, 1000);
+    if (this.multCD <= 0 && gameMultiply > 1) {
+        gameMultiply -= 0.25;
+        this.multCD = 100;
     }
-    
+    this.multCD--; 
+
+    if (gameLevel > 5) {
+        this.genHeart();
+    }
+}
+
+Events.prototype.resetLevel = function() {
+    this.levelStart = Date.now();
 }
 
 Events.prototype.genHeart = function() {
@@ -239,18 +256,23 @@ Events.prototype.genHeart = function() {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player, level, allEnemies, allItems, message, events, gameStatus, selector;
 
-message = new Message();
+//declare object variables
+var player, allEnemies, allItems, message, events, selector;
+//declare game mechanics variables
+var gameLevel, gameScore, gameStatus, gameMultiply;
+
 
 var resetGame = function() {
     player = new Player();
     selector = new Selector();
     events = new Events();
-    level = 0;
+    message = new Message();
+    gameLevel = 0;
     allEnemies = [new Enemy(), new Enemy()];
     allItems = [];
     gameStatus = "start";
+    gameScore = 0;
 }
 
 var startGame = function() {
@@ -267,22 +289,24 @@ var resetLevel = function() {
     for (enemy in allEnemies) {
         allEnemies[enemy].reset();
     }
+    gameMultiply = 3;
+    events.resetLevel();
 }
 
 var nextLevel = function() {
     resetLevel();
     // handles level progression
-    level++;
-    message.reset("level %".replace("%", level), "regular");
+    gameLevel++;
+    message.reset("level %".replace("%", gameLevel), "regular");
     
     // increment the number of enemies
     bug = new Enemy();
     allEnemies.push(bug);
 
     // bonus life every 10 levels
-    if (level % 10 === 0) {
+    if (gameLevel % 10 === 0) {
         player.lives++;
-        message.reset("level %, +1".replace("%", level), "regular");
+        message.reset("level %, +1".replace("%", gameLevel), "regular");
     }
 }
 
@@ -304,6 +328,7 @@ var detectCollision = function(obj) {
             }        
         } else if (obj.type === "heart") {
             player.lives++
+            gameScore += 100;
             obj.wrap();
             //TODO collide with other objects
         }

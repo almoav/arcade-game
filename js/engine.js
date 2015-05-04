@@ -23,7 +23,8 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
+        topScore;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -117,7 +118,7 @@ var Engine = (function(global) {
         });
         player.update();
         message.update();
-        events.update();
+        events.update(dt);
     }
 
     /* This function initially draws the "game level", it will then call
@@ -155,34 +156,27 @@ var Engine = (function(global) {
 
         //switch between rendering start screen and game play
         if (gameStatus == "run") {
+            //render environment
             for (row = 0; row < numRows; row++) {
                 for (col = 0; col < numCols; col++) {
                     ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
                 }
             }
-            ctx.drawImage(Resources.get(player.sprite), 0, 5, 30, 50)
-            for (i=0; i < player.lives; i++) {
-                ctx.drawImage(Resources.get('images/Heart.png'), (i+1) * 28, 15, 25, 40)
-            }
+            renderHud();
+            renderEntities();  
 
-            renderEntities();          
         } else {
             // start menu
             //fill bkg with grass
             for (row = 0; row < numRows; row++) {
                 for (col = 0; col < numCols; col++) {
-                    //console.log(row, col);
                     ctx.drawImage(Resources.get('images/grass-block.png'), col * 101, row * 83);
-                    //ctx.drawImage(Resources.get('images/grass-block.png'), 101,  83);
-                    //console.log('test');
                 }            
             }
             selector.render();
             
             //render characters
             for (image in charImages) {
-                //console.log(image * 101);
-                //col = image * 101
                 ctx.drawImage(Resources.get(charImages[image]), image * 101, 83 * 3 - 30);
                 
             }
@@ -218,6 +212,35 @@ var Engine = (function(global) {
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
      */
+    function renderHud() {
+        //render player life, score etc.
+        
+        ctx.save();
+
+        ctx.font = "16pt impact";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "black";
+        
+        //life
+        ctx.drawImage(Resources.get(player.sprite), 0, 5, 30, 50)
+        if (player.lives < 4){
+            for (i=0; i < player.lives; i++) {
+                ctx.drawImage(Resources.get('images/Heart.png'), (i+1) * 28, 15, 25, 40)
+            };
+        } else {
+            ctx.drawImage(Resources.get('images/Heart.png'), 28, 15, 25, 40)
+            ctx.fillText("x%".replace("%", player.lives), 68, 45);
+        }
+        
+        //score
+        ctx.fillText("score: %".replace("%", gameScore), 172, 45);
+        ctx.fillText("multiply: %".replace("%", gameMultiply), 330, 45);      
+
+        ctx.restore();
+
+    }
+
+
     function reset() {
         //console.log("reset");
     }
