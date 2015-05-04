@@ -13,7 +13,7 @@ Enemy.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.speed = (Math.random() + .5) * 200;
     this.x = (Math.random() * 500) - 150;
-    this.y = (83 * this.row) -10; 
+    this.y = (83 * this.row) -36; 
 }
 
 // Update the enemy's position, required method for game
@@ -22,11 +22,9 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers. 
-    //console.log(dt);
-    
-
     this.x += (this.speed*dt);
 
+    //collision detection
     if (this.y === player.y && Math.abs(player.x-this.x) < 60) {
         player.lives -= 1;
         if (player.lives > 0) {
@@ -38,7 +36,7 @@ Enemy.prototype.update = function(dt) {
             message.reset("game over", "end");
             //setTimeout(function(){message.reset("game over");}, 1000);
             player.reset();
-            setTimeout(resetGame, 1500);
+            setTimeout(resetGame, 2000);
             //resetGame();
         }
 
@@ -46,7 +44,7 @@ Enemy.prototype.update = function(dt) {
         //wrap the enemy around to start
         this.x = (Math.random() * -450) - 50;
         this.row = Math.max(Math.round(Math.random() * 3), 1);
-        this.y = (83 * this.row) -10;
+        this.y = (83 * this.row) -36;
     }
 }
 
@@ -69,7 +67,7 @@ var Player = function() {
 Player.prototype.reset = function() {
     //place player back at start position
     this.x = 200;
-    this.y = (83 * 5) - 10;    
+    this.y = (83 * 5) - 36;    
 }
 
 Player.prototype.update = function() {
@@ -102,6 +100,40 @@ Player.prototype.handleInput = function(key) {
         
 }
 
+var Selector = function() {
+    //subclass of player used in start screen to select
+    //character sprite
+    Player.call(this);
+    this.sprite = 'images/Selector.png';
+    this.x = 0;
+    this.y = 83*3-36;
+    this.charImages = [
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png'
+        ];
+
+}
+
+Selector.prototype = Object.create(Player.prototype);
+
+Selector.prototype.handleInput = function(key) {
+    if (key === "left"){
+        ((this.x === -2) ? null : this.x -= 101);
+    } else if (key === "right") {
+        ((this.x === 402) ? null : this.x += 101);
+    } else if (key === "enter") {
+        //console.log("start" );
+        select =  this.x/101;
+        //console.log(this.charImages[select]);
+        player.sprite = this.charImages[select];
+        startGame();
+
+    }
+}
+
 
 var Message = function() {
     //used for storing and displaying messages to the canvas
@@ -124,8 +156,6 @@ Message.prototype.reset = function(msg, msgtype) {
  
 Message.prototype.render = function() {
     //display render message to canvas
-    //need to track length of message display and microseconds 
-    //since dislpay start
     var len = 1500.0;
     var ms = Date.now() - this.start;
     var alpha = 1.0;
@@ -141,22 +171,19 @@ Message.prototype.render = function() {
         //fade color over time
         Cr = parseInt(Cr * alpha * 1.5);
         fill = fill.replace(/[#]/g, Cr);
-        
-        //fill = fill.replace(/[$]/g, 255);
-        
 
-        
-        
         //switch stroke color for different message types
         if (this.msgtype === "regular") {
             ctx.strokeStyle = "rgba(0,120,0,%)".replace("%", alpha);            
         } else {
+            //disable player movement for death messages
             player.move = false;
             ctx.fillStyle = bkgfill;    
             ctx.fillRect(0,0,505,606);
             ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
         }
         
+        //text render
         ctx.fillStyle = fill;
         ctx.fillText(this.msg, 250, 275);
         ctx.strokeText(this.msg, 250, 275);
@@ -179,19 +206,25 @@ Clock.prototype.timestep = function(dt) {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var player, level, allEnemies, clock, message;
+var player, level, allEnemies, clock, message, gameStatus, selector;
 
 message = new Message();
-clock = new Clock();
+//clock = new Clock();
 
 var resetGame = function() {
     player = new Player();
+    selector = new Selector();
     //clock = new Clock();
     //message = new Message();
-    level = 1;
-    allEnemies = [new Enemy(), new Enemy(), new Enemy()];
-    //console.log("level %".replace("%", level));
-    message.reset("level %".replace("%", level), "regular");
+    level = 0;
+    allEnemies = [new Enemy(), new Enemy()];
+    gameStatus = "start";
+    //message.reset("level %".replace("%", level), "regular");
+}
+
+var startGame = function() {
+    gameStatus = "run";
+    nextLevel();
 }
 
 // level stuff
@@ -205,6 +238,7 @@ var resetLevel = function() {
 }
 
 var nextLevel = function() {
+    resetLevel();
     // handles level progression
     level++;
     //console.log("level %".replace("%", level));
@@ -222,6 +256,10 @@ var nextLevel = function() {
     }
 }
 
+var collision = function() {
+    //container for actions executed with player collisions
+}
+
 resetGame();
 
 // This listens for key presses and sends the keys to your
@@ -231,8 +269,10 @@ document.addEventListener('keyup', function(e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        13: 'enter'
     };
 
     player.handleInput(allowedKeys[e.keyCode]);
+    selector.handleInput(allowedKeys[e.keyCode]);
 });

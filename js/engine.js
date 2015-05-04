@@ -88,7 +88,7 @@ var Engine = (function(global) {
         updateEntities(dt);
         
         // count the current frame
-        clock.timestep(dt);
+        //clock.timestep(dt);
 
         // checkCollisions();
     }
@@ -139,7 +139,17 @@ var Engine = (function(global) {
                 'images/stone-block.png',   // Row 3 of 3 of stone
                 'images/grass-block.png',   // Row 1 of 2 of grass
                 'images/grass-block.png'    // Row 2 of 2 of grass
+            ], 
+            /*
+            charImages = [
+                'images/char-boy.png',
+                'images/char-cat-girl.png',
+                'images/char-horn-girl.png',
+                'images/char-pink-girl.png',
+                'images/char-princess-girl.png'
             ],
+            */
+            charImages = selector.charImages,
             numRows = 6,
             numCols = 5,
             row, col;
@@ -148,15 +158,40 @@ var Engine = (function(global) {
          * and, using the rowImages array, draw the correct image for that
          * portion of the "grid"
          */
-        
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+
+        //switch between rendering start screen and game play
+        if (gameStatus == "run") {
+            for (row = 0; row < numRows; row++) {
+                for (col = 0; col < numCols; col++) {
+                    ctx.drawImage(Resources.get(rowImages[row]), col * 101, row * 83);
+                }
             }
+            renderEntities();          
+        } else {
+            //fill bkg with grass
+            for (row = 0; row < numRows; row++) {
+                for (col = 0; col < numCols; col++) {
+                    //console.log(row, col);
+                    ctx.drawImage(Resources.get('images/grass-block.png'), col * 101, row * 83);
+                    //ctx.drawImage(Resources.get('images/grass-block.png'), 101,  83);
+                    //console.log('test');
+                }            
+            }
+            selector.render();
+            
+            //render characters
+            for (image in charImages) {
+                //console.log(image * 101);
+                //col = image * 101
+                ctx.drawImage(Resources.get(charImages[image]), image * 101, 83 * 3 - 30);
+                
+            }
+
         }
+
         
 
-        renderEntities();
+        
     }
 
     /* This function is called by the render function and is called on each game
@@ -192,7 +227,12 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png',
+        'images/Selector.png'
     ]);
     Resources.onReady(init);
 
