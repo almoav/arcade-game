@@ -24,7 +24,7 @@ var Engine = (function(global) {
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime,
-        topScore;
+        topScore = 0;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -87,7 +87,9 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        
+        if (gameScore > topScore) {
+            topScore = gameScore;
+        }
         // count the current frame
         //clock.timestep(dt);
         // checkCollisions();
@@ -129,6 +131,8 @@ var Engine = (function(global) {
      */
     function render() {
         //fill bkg with white
+        ctx.save();
+
         ctx.fillStyle = "white";
         ctx.fillRect(0,0,505,606);
 
@@ -173,16 +177,19 @@ var Engine = (function(global) {
                     ctx.drawImage(Resources.get('images/grass-block.png'), col * 101, row * 83);
                 }            
             }
-            selector.render();
-            
             //render characters
+            selector.render();
             for (image in charImages) {
                 ctx.drawImage(Resources.get(charImages[image]), image * 101, 83 * 3 - 30);
                 
             }
 
+            renderStart();
+
+
         }
 
+        ctx.restore();
         
 
         
@@ -240,6 +247,24 @@ var Engine = (function(global) {
 
     }
 
+    function renderStart() {
+        // render start screen
+        ctx.save();
+
+        ctx.font = "16pt impact";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#33CC33"; 
+        ctx.fillStyle = "#FF5050"
+        ctx.strokeStyle = "black 1px";
+        
+        ctx.strokeText("top score: %".replace("%", topScore), 250, 175);
+        ctx.fillText("top score: %".replace("%", topScore), 250, 175);
+        ctx.strokeText("press [enter] to start", 250, 425);
+        ctx.fillText("press [enter] to start", 250, 425);      
+        
+        ctx.restore();              
+    }
+
 
     function reset() {
         //console.log("reset");
@@ -260,7 +285,9 @@ var Engine = (function(global) {
         'images/char-pink-girl.png',
         'images/char-princess-girl.png',
         'images/Selector.png',
-        'images/Heart.png'
+        'images/Heart.png',
+        'images/Gem Blue.png',
+        'images/Gem Green.png'
     ]);
     Resources.onReady(init);
 

@@ -42,7 +42,9 @@ Enemy.prototype.wrap = function() {
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+    scale = 150;
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 96, scale);    
+    //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 var Heart = function() {
@@ -64,8 +66,32 @@ Heart.prototype.render = function() {
 
 Heart.prototype.wrap = function() {
     this.move = false;
-    allItems.pop();
 }
+
+var GemBlue = function() {
+    Enemy.call(this);
+    this.type = "gem blue";
+    this.sprite = 'images/Gem Blue.png';
+    this.speed = 150;
+}
+GemBlue.prototype = Object.create(Enemy.prototype);
+GemBlue.prototype.constructor = GemBlue;
+
+GemBlue.prototype.render = function() {
+    scale = 60;
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 145-scale, 45, scale);
+    
+}
+
+var GemGreen = function() {
+    GemBlue.call(this);
+    this.type = "gem green";
+    this.sprite = 'images/Gem Green.png';   
+}
+
+GemGreen.prototype = Object.create(GemBlue.prototype);
+GemGreen.prototype.constructor = GemGreen;
+
 
 
 // Now write your own player class
@@ -175,12 +201,14 @@ Message.prototype.render = function() {
     var Cr = 255;
     var fill = "rgba(#,#,#,%)";
     var bkgfill = "rgba(20,20,20,%)";
+    var redFill = "rgba(255,80,80,%";
     if (ms < len) {
         // fade alpha over length of display
         
         alpha = (len - ms)/len;
         fill = fill.replace("%", alpha);
         bkgfill = bkgfill.replace("%", alpha);
+        redFill = redFill.replace("%", alpha);
 
         //fade color over time
         Cr = parseInt(Cr * alpha * 1.5);
@@ -188,19 +216,22 @@ Message.prototype.render = function() {
 
         //switch stroke color for different message types
         if (this.msgtype === "regular") {
-            ctx.strokeStyle = "rgba(0,120,0,%)".replace("%", alpha);            
+            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);            
+            ctx.fillStyle = fill;
         } else {
             //disable player movement for death messages
             player.move = false;
             ctx.fillStyle = bkgfill;    
             ctx.fillRect(0,0,505,606);
-            ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
+            //ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
+            ctx.fillStyle = redFill;
+            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);
         }
         
         //text render
-        ctx.fillStyle = fill;
-        ctx.fillText(this.msg, 250, 275);
         ctx.strokeText(this.msg, 250, 275);
+        ctx.fillText(this.msg, 250, 275);
+        
         
     } else {
         player.move = true;   
@@ -223,15 +254,17 @@ var Events = function() {
 Events.prototype.update = function(dt) {
     this.gameElapsed = Date.now() - this.gameStart;
     this.levelElapsed = Date.now() - this.levelStart;
+    //keep the score an integer
+    gameScore = parseInt(gameScore);
+
     //decrease the score multiplier by a factor of delta time
-    //gameMultiply = gameMultiply - Math.round(50 * dt)/200;
-    //setInterval(function() {gameMultiply -= 0.25}, 1000);
     if (this.multCD <= 0 && gameMultiply > 1) {
         gameMultiply -= 0.25;
         this.multCD = 100;
     }
     this.multCD--; 
 
+    //start generating hearts based on time elapsed
     if (gameLevel > 5) {
         this.genHeart();
     }
@@ -243,7 +276,7 @@ Events.prototype.resetLevel = function() {
 
 Events.prototype.genHeart = function() {
     if (this.heartCD <= 0) {
-        console.log("gen heart");
+        //console.log("gen heart");
         heart = new Heart();
         allItems.push(heart);
         this.heartCD = 1000;
@@ -270,7 +303,7 @@ var resetGame = function() {
     message = new Message();
     gameLevel = 0;
     allEnemies = [new Enemy(), new Enemy()];
-    allItems = [];
+    allItems = [new Heart(), new GemBlue()];
     gameStatus = "start";
     gameScore = 0;
 }
@@ -290,6 +323,7 @@ var resetLevel = function() {
         allEnemies[enemy].reset();
     }
     gameMultiply = 3;
+    //allItems.length = 0;
     events.resetLevel();
 }
 
@@ -308,12 +342,22 @@ var nextLevel = function() {
         player.lives++;
         message.reset("level %, +1".replace("%", gameLevel), "regular");
     }
+
+    allItems = [];
+    for(i=3; i<gameLevel; i++) {
+        allItems.push(new GemBlue());
+    }
+
+    for(i=10; i<gameLevel; i+=2) {
+        allItems.push(new GemGreen());   
+    }
+    //console.log("allitems count ", allItems.length );
 }
 
 var detectCollision = function(obj) {
     //container for actions executed with player collisions
     //param: object invoking this method
-    if (obj.y === player.y && Math.abs(player.x-obj.x) < 60) {
+    if (obj.y === player.y && Math.abs(player.x-obj.x) < 50) {
         //object has collided
         if (obj.type === "enemy") {
             player.lives--;
@@ -328,11 +372,25 @@ var detectCollision = function(obj) {
             }        
         } else if (obj.type === "heart") {
             player.lives++
-            gameScore += 100;
-            obj.wrap();
-            //TODO collide with other objects
+            gameScore += (50 * gameLevel * gameMultiply);
+            removeItem(allItems, obj);
+
+        } else if (obj.type === "gem blue") {
+            gameScore += (10 * gameLevel * gameMultiply);
+            removeItem(allItems, obj);
+        } else if (obj.type === "gem green") {
+            gameScore += (50 * gameLevel * gameMultiply);
+            removeItem(allItems, obj);
         }
     }    
+}
+
+var removeItem = function(array, item) {
+    //removes an item from an array
+    var index = array.indexOf(item);
+    if (index > -1) {
+        array.splice(index, 1);
+    }
 }
 
 resetGame();
