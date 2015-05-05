@@ -92,6 +92,14 @@ var GemGreen = function() {
 GemGreen.prototype = Object.create(GemBlue.prototype);
 GemGreen.prototype.constructor = GemGreen;
 
+var GemOrange = function() {
+    GemBlue.call(this);
+    this.type = "gem orange";
+    this.sprite = 'images/Gem Orange.png';   
+}
+
+GemOrange.prototype = Object.create(GemBlue.prototype);
+GemOrange.prototype.constructor = GemOrange;
 
 
 // Now write your own player class
@@ -343,15 +351,20 @@ var nextLevel = function() {
         message.reset("level %, +1".replace("%", gameLevel), "regular");
     }
 
+    //append the level items
     allItems = [];
+    //blue gems
     for(i=3; i<gameLevel; i++) {
         allItems.push(new GemBlue());
     }
-
+    //green gems
     for(i=10; i<gameLevel; i+=2) {
         allItems.push(new GemGreen());   
     }
-    //console.log("allitems count ", allItems.length );
+    //orange gems
+    for(i=12; i<gameLevel; i+=3) {
+        allItems.push(new GemOrange());   
+    }
 }
 
 var detectCollision = function(obj) {
@@ -380,6 +393,9 @@ var detectCollision = function(obj) {
             removeItem(allItems, obj);
         } else if (obj.type === "gem green") {
             gameScore += (50 * gameLevel * gameMultiply);
+            removeItem(allItems, obj);
+        } else if (obj.type === "gem orange") {
+            gameScore += (150 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
         }
     }    
