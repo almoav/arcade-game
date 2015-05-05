@@ -101,6 +101,27 @@ var GemOrange = function() {
 GemOrange.prototype = Object.create(GemBlue.prototype);
 GemOrange.prototype.constructor = GemOrange;
 
+var Rock = function() {
+    //impassable object restricts players movement
+    this.type = "rock";
+    this.sprite = 'images/Rock.png'
+    this.reset();
+}
+
+Rock.prototype.reset = function() {
+    this.row = Math.max(Math.round(Math.random() * 4), 1);
+    this.col = Math.round((Math.random() * 6));
+    this.y = (83 * this.row) -36;
+    this.x = 101 * this.col;
+}
+
+Rock.prototype.update = function() {
+    detectCollision(this);
+}
+
+Rock.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);    
+}
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -135,6 +156,9 @@ Player.prototype.render = function() {
 
 Player.prototype.handleInput = function(key) {
     // takes player input and translates into player position
+    //store previous position for collision purposes
+    this.x_last = this.x;
+    this.y_last = this.y;
     // only if move attribute is set to true
     if (this.move === true) {
         if (key === "left"){
@@ -145,7 +169,9 @@ Player.prototype.handleInput = function(key) {
             ((this.x === 402) ? null : this.x += 101);
         } else if (key === "down") {
             ((this.y === 379) ? null : this.y += 83);
-        }        
+        } else if (key === "quit") {
+            resetGame();
+        }
     }
         
 }
@@ -203,7 +229,10 @@ Message.prototype.reset = function(msg, msgtype) {
  
 Message.prototype.render = function() {
     //display render message to canvas
-    var len = 1500.0;
+    var len = 1200.0;
+    if (this.msgtype === "end") {
+        len = 2000.0;
+    }
     var ms = Date.now() - this.start;
     var alpha = 1.0;
     var Cr = 255;
@@ -226,7 +255,7 @@ Message.prototype.render = function() {
         if (this.msgtype === "regular") {
             ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);            
             ctx.fillStyle = fill;
-        } else {
+        } else if (this.msgtype === "death") {
             //disable player movement for death messages
             player.move = false;
             ctx.fillStyle = bkgfill;    
@@ -234,9 +263,17 @@ Message.prototype.render = function() {
             //ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
             ctx.fillStyle = redFill;
             ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);
+        } else if (this.msgtype === "end") {
+            player.move = false;
+            ctx.fillStyle = "rgb(20,20,20)";
+            ctx.fillRect(0,0,505,606);
+            ctx.fillStyle = redFill;
+            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);
         }
         
         //text render
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#191919";        
         ctx.strokeText(this.msg, 250, 275);
         ctx.fillText(this.msg, 250, 275);
         
@@ -299,7 +336,7 @@ Events.prototype.genHeart = function() {
 // Place the player object in a variable called player
 
 //declare object variables
-var player, allEnemies, allItems, message, events, selector;
+var player, allEnemies, allItems, allObstacles, message, events, selector;
 //declare game mechanics variables
 var gameLevel, gameScore, gameStatus, gameMultiply;
 
@@ -311,7 +348,8 @@ var resetGame = function() {
     message = new Message();
     gameLevel = 0;
     allEnemies = [new Enemy(), new Enemy()];
-    allItems = [new Heart(), new GemBlue()];
+    allItems = [];
+    allObstacles = [];
     gameStatus = "start";
     gameScore = 0;
 }
@@ -353,24 +391,30 @@ var nextLevel = function() {
 
     //append the level items
     allItems = [];
+    allObstacles = [];
     //blue gems
-    for(i=3; i<gameLevel; i++) {
+    for(i=1; i<gameLevel; i++) {
         allItems.push(new GemBlue());
     }
     //green gems
-    for(i=10; i<gameLevel; i+=2) {
+    for(i=3; i<gameLevel; i+=2) {
         allItems.push(new GemGreen());   
     }
     //orange gems
-    for(i=12; i<gameLevel; i+=3) {
+    for(i=9; i<gameLevel; i+=3) {
         allItems.push(new GemOrange());   
     }
+
+    //rocks
+    for(i=9; i<gameLevel; i+=4) {
+        allObstacles.push(new Rock());   
+    }    
 }
 
 var detectCollision = function(obj) {
     //container for actions executed with player collisions
     //param: object invoking this method
-    if (obj.y === player.y && Math.abs(player.x-obj.x) < 50) {
+    if (obj.y === player.y && Math.abs(player.x-obj.x) < 40) {
         //object has collided
         if (obj.type === "enemy") {
             player.lives--;
@@ -397,6 +441,9 @@ var detectCollision = function(obj) {
         } else if (obj.type === "gem orange") {
             gameScore += (150 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
+        } else if (obj.type === "rock") {
+            player.x = player.x_last;
+            player.y = player.y_last;
         }
     }    
 }
@@ -419,7 +466,8 @@ document.addEventListener('keyup', function(e) {
         38: 'up',
         39: 'right',
         40: 'down',
-        13: 'enter'
+        13: 'enter',
+        81: 'quit'
     };
 
     player.handleInput(allowedKeys[e.keyCode]);

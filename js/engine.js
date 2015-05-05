@@ -112,12 +112,18 @@ var Engine = (function(global) {
      * render methods.
      */
     function updateEntities(dt) {
+        allObstacles.forEach(function(obstacle) {
+            obstacle.update();
+        });
+
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
+        
         allItems.forEach(function(item) {
             item.update(dt);
         });
+        
         player.update();
         message.update();
         events.update(dt);
@@ -203,13 +209,17 @@ var Engine = (function(global) {
         /* Loop through all of the objects within the allEnemies array and call
          * the render function you have defined.
          */
+        allObstacles.forEach(function(item) {
+            item.render();
+        });  
+
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
 
         allItems.forEach(function(item) {
             item.render();
-        });
+        });    
 
         player.render();
         message.render();
@@ -226,7 +236,11 @@ var Engine = (function(global) {
 
         ctx.font = "16pt impact";
         ctx.textAlign = "left";
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "white";
+        ctx.strokeStyle = "black";
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "#191919";
+
         
         //life
         ctx.drawImage(Resources.get(player.sprite), 0, 5, 30, 50)
@@ -240,8 +254,19 @@ var Engine = (function(global) {
         }
         
         //score
-        ctx.fillText("score: %".replace("%", gameScore), 172, 45);
-        ctx.fillText("multiply: %".replace("%", gameMultiply), 330, 45);      
+        ctx.strokeText("score: %".replace("%", gameScore), 140, 45);
+        ctx.fillText("score: %".replace("%", gameScore), 140, 45);
+        ctx.strokeText("x: %".replace("%", gameMultiply), 320, 45);
+        ctx.fillText("x: %".replace("%", gameMultiply), 320, 45);
+
+        //level
+        ctx.strokeText("level %".replace("%", gameLevel), 420, 45);
+        ctx.fillText("level %".replace("%", gameLevel), 420, 45);
+
+        ctx.font = "12pt impact";
+        //ctx.shadowColor = "white";
+        ctx.strokeText("press q to quit", 10, 602);
+        ctx.fillText("press q to quit", 10, 602);
 
         ctx.restore();
 
@@ -251,14 +276,35 @@ var Engine = (function(global) {
         // render start screen
         ctx.save();
 
+        //game title
+        ctx.font = "bold 48pt impact";
+        ctx.textAlign = "center";
+        
+        grad = ctx.createLinearGradient(0,120,0,160);
+        grad.addColorStop(.1, "#FFD980");
+        grad.addColorStop(.3, "white");
+        grad.addColorStop(.8, "#FFCC00");
+        
+        ctx.fillStyle = grad;
+        ctx.strokeStyle = "black 10px";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "#191919";     
+        
+        ctx.strokeText("Bug Force 5", 250, 160);
+        ctx.fillText("Bug Force 5", 250, 160);
+
+        ctx.restore(); 
+
         ctx.font = "16pt impact";
         ctx.textAlign = "center";
         ctx.fillStyle = "#33CC33"; 
         ctx.fillStyle = "#FF5050"
         ctx.strokeStyle = "black 1px";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#191919";
         
-        ctx.strokeText("top score: %".replace("%", topScore), 250, 175);
-        ctx.fillText("top score: %".replace("%", topScore), 250, 175);
+        ctx.strokeText("top score: %".replace("%", topScore), 250, 195);
+        ctx.fillText("top score: %".replace("%", topScore), 250, 195);
         ctx.strokeText("press [enter] to start", 250, 425);
         ctx.fillText("press [enter] to start", 250, 425);      
         
@@ -288,7 +334,8 @@ var Engine = (function(global) {
         'images/Heart.png',
         'images/Gem Blue.png',
         'images/Gem Green.png',
-        'images/Gem Orange.png'
+        'images/Gem Orange.png',
+        'images/Rock.png'
     ]);
     Resources.onReady(init);
 
