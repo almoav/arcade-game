@@ -5,11 +5,11 @@ var Enemy = function() {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
-    this.type = "enemy";
+    this.type = 'enemy';
     this.sprite = 'images/enemy-bug.png';
     this.move = true;
     this.reset();
-}
+};
 
 Enemy.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 3), 1);
@@ -35,6 +35,7 @@ Enemy.prototype.update = function(dt) {
 }
 
 Enemy.prototype.wrap = function() {
+    //wrap the object back around when it goes off the right side
     this.x = (Math.random() * -450) - 50;
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.y = (83 * this.row) -36;
@@ -44,17 +45,17 @@ Enemy.prototype.wrap = function() {
 Enemy.prototype.render = function() {
     scale = 150;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 96, scale);    
-    //ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 var Heart = function() {
     //heart item player interacts with
     Enemy.call(this);
-    this.type = "heart";
+    this.type = 'heart';
     this.sprite = 'images/Heart.png';
     this.x = -500;
     this.speed = 200;
-}
+};
+
 Heart.prototype = Object.create(Enemy.prototype);
 Heart.prototype.constructor = Heart;
 
@@ -70,10 +71,11 @@ Heart.prototype.wrap = function() {
 
 var GemBlue = function() {
     Enemy.call(this);
-    this.type = "gem blue";
+    this.type = 'gem blue';
     this.sprite = 'images/Gem Blue.png';
     this.speed = 150;
-}
+};
+
 GemBlue.prototype = Object.create(Enemy.prototype);
 GemBlue.prototype.constructor = GemBlue;
 
@@ -85,28 +87,28 @@ GemBlue.prototype.render = function() {
 
 var GemGreen = function() {
     GemBlue.call(this);
-    this.type = "gem green";
-    this.sprite = 'images/Gem Green.png';   
-}
+    this.type = 'gem green';
+    this.sprite = 'images/Gem Green.png';
+};
 
 GemGreen.prototype = Object.create(GemBlue.prototype);
 GemGreen.prototype.constructor = GemGreen;
 
 var GemOrange = function() {
     GemBlue.call(this);
-    this.type = "gem orange";
-    this.sprite = 'images/Gem Orange.png';   
-}
+    this.type = 'gem orange';
+    this.sprite = 'images/Gem Orange.png';
+};
 
 GemOrange.prototype = Object.create(GemBlue.prototype);
 GemOrange.prototype.constructor = GemOrange;
 
 var Rock = function() {
     //impassable object restricts players movement
-    this.type = "rock";
+    this.type = 'rock';
     this.sprite = 'images/Rock.png'
     this.reset();
-}
+};
 
 Rock.prototype.reset = function() {
     this.row = Math.max(Math.round(Math.random() * 4), 1);
@@ -120,19 +122,19 @@ Rock.prototype.update = function() {
 }
 
 Rock.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);    
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
 // Now write your own player class
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
-    this.type = "player";
+    this.type = 'player';
     this.lives = 3;
     this.sprite = 'images/char-boy.png';
     this.reset()
     this.move = true;
-}
+};
 
 Player.prototype.reset = function() {
     //place player back at start position
@@ -143,7 +145,6 @@ Player.prototype.reset = function() {
 Player.prototype.update = function() {
     if (this.y < 0) {
         //do when player reaches water tiles
-        //console.log("level beaten");
         gameScore += (100 * gameLevel * gameMultiply);
         nextLevel();
         resetLevel();
@@ -159,17 +160,17 @@ Player.prototype.handleInput = function(key) {
     //store previous position for collision purposes
     this.x_last = this.x;
     this.y_last = this.y;
-    // only if move attribute is set to true
+    //apply move only if move attribute is set to true
     if (this.move === true) {
-        if (key === "left"){
+        if (key === 'left'){
             ((this.x === -2) ? null : this.x -= 101);
-        } else if (key === "up") {
+        } else if (key === 'up') {
             ((this.y === -10) ? null : this.y -= 83);
-        } else if (key === "right") {
+        } else if (key === 'right') {
             ((this.x === 402) ? null : this.x += 101);
-        } else if (key === "down") {
+        } else if (key === 'down') {
             ((this.y === 379) ? null : this.y += 83);
-        } else if (key === "quit") {
+        } else if (key === 'quit') {
             resetGame();
         }
     }
@@ -180,7 +181,7 @@ var Selector = function() {
     //subclass of player used in start screen to select
     //character sprite
     Player.call(this);
-    this.type = "selector";
+    this.type = 'selector';
     this.sprite = 'images/Selector.png';
     this.x = 0;
     this.y = 83*3-36;
@@ -192,16 +193,17 @@ var Selector = function() {
         'images/char-princess-girl.png'
         ];
 
-}
+};
+
 Selector.prototype = Object.create(Player.prototype);
 Selector.prototype.constructor = Selector;
 
 Selector.prototype.handleInput = function(key) {
-    if (key === "left"){
+    if (key === 'left'){
         ((this.x === 0) ? null : this.x -= 101);
-    } else if (key === "right") {
+    } else if (key === 'right') {
         ((this.x === 404) ? null : this.x += 101);
-    } else if (key === "enter") {
+    } else if (key === 'enter') {
         select =  this.x/101;
         player.sprite = this.charImages[select];
         startGame();
@@ -211,9 +213,9 @@ Selector.prototype.handleInput = function(key) {
 
 var Message = function() {
     //used for storing and displaying messages to the canvas
-    this.msg = "new";
-    this.reset("new game", "regular");
-}
+    this.msg = 'new';
+    this.reset('new game', 'regular');
+};
 
 Message.prototype.update = function() {
     //Does nothing
@@ -228,78 +230,83 @@ Message.prototype.reset = function(msg, msgtype) {
 }
  
 Message.prototype.render = function() {
-    //display render message to canvas
+    //render message to canvas
+    //length to display
     var len = 1200.0;
-    if (this.msgtype === "end") {
+    if (this.msgtype === 'end') {
         len = 2000.0;
     }
+    //microsecond
     var ms = Date.now() - this.start;
+    //animated color components
     var alpha = 1.0;
     var Cr = 255;
-    var fill = "rgba(#,#,#,%)";
-    var bkgfill = "rgba(20,20,20,%)";
-    var redFill = "rgba(255,80,80,%";
+    var fill = 'rgba(#,#,#,%)';
+    var bkgfill = 'rgba(20,20,20,%)';
+    var redFill = 'rgba(255,80,80,%';
     if (ms < len) {
         // fade alpha over length of display
-        
         alpha = (len - ms)/len;
-        fill = fill.replace("%", alpha);
-        bkgfill = bkgfill.replace("%", alpha);
-        redFill = redFill.replace("%", alpha);
+        fill = fill.replace('%', alpha);
+        bkgfill = bkgfill.replace('%', alpha);
+        redFill = redFill.replace('%', alpha);
 
         //fade color over time
         Cr = parseInt(Cr * alpha * 1.5);
         fill = fill.replace(/[#]/g, Cr);
 
         //switch stroke color for different message types
-        if (this.msgtype === "regular") {
-            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);            
+        if (this.msgtype === 'regular') {
+            ctx.strokeStyle = 'rgba(0,0,0,%)'.replace('%', alpha);
             ctx.fillStyle = fill;
-        } else if (this.msgtype === "death") {
+
+        } else if (this.msgtype === 'death') {
             //disable player movement for death messages
             player.move = false;
-            ctx.fillStyle = bkgfill;    
+            ctx.fillStyle = bkgfill;
             ctx.fillRect(0,0,505,606);
-            //ctx.strokeStyle = "rgba(90,0,0,%)".replace("%", alpha);
+            //ctx.strokeStyle = 'rgba(90,0,0,%)'.replace('%', alpha);
             ctx.fillStyle = redFill;
-            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);
-        } else if (this.msgtype === "end") {
+            ctx.strokeStyle = 'rgba(0,0,0,%)'.replace('%', alpha);
+
+        } else if (this.msgtype === 'end') {
             player.move = false;
-            ctx.fillStyle = "rgb(20,20,20)";
+            ctx.fillStyle = 'rgb(20,20,20)';
             ctx.fillRect(0,0,505,606);
             ctx.fillStyle = redFill;
-            ctx.strokeStyle = "rgba(0,0,0,%)".replace("%", alpha);
+            ctx.strokeStyle = 'rgba(0,0,0,%)'.replace('%', alpha);
         }
         
         //text render
         ctx.shadowBlur = 10;
-        ctx.shadowColor = "#191919";        
+        ctx.shadowColor = '#191919';
         ctx.strokeText(this.msg, 250, 275);
         ctx.fillText(this.msg, 250, 275);
         
         
     } else {
-        player.move = true;   
+        player.move = true;
     }
     message.count--;
-
 }
 
 var Events = function() {
+    //game events trigged by time
     //set start time when game starts
     this.gameStart = 0;
     this.levelStart = 0;
     this.gameElapsed = 0;
     this.levelElapsed = 0;
-    //heart item genration count down
+    
+    //countdown timers
     this.heartCD = 1000;
     this.multCD = 100;
-}
+};
 
 Events.prototype.update = function(dt) {
     this.gameElapsed = Date.now() - this.gameStart;
     this.levelElapsed = Date.now() - this.levelStart;
-    //keep the score an integer
+    //make the score an integer
     gameScore = parseInt(gameScore);
 
     //decrease the score multiplier by a factor of delta time
@@ -321,14 +328,11 @@ Events.prototype.resetLevel = function() {
 
 Events.prototype.genHeart = function() {
     if (this.heartCD <= 0) {
-        //console.log("gen heart");
         heart = new Heart();
         allItems.push(heart);
         this.heartCD = 1000;
     }   
     this.heartCD--; 
-    //console.log(this.heartCD);
-
 }
 
 // Now instantiate your objects.
@@ -350,34 +354,35 @@ var resetGame = function() {
     allEnemies = [new Enemy(), new Enemy()];
     allItems = [];
     allObstacles = [];
-    gameStatus = "start";
+    gameStatus = 'start';
     gameScore = 0;
-}
+};
 
 var startGame = function() {
-    gameStatus = "run";
+    gameStatus = 'run';
     events.start = Date.now();
     nextLevel();
-}
+};
 
 // level stuff
 var resetLevel = function() {
     // convenience function for resetting enemies and player 
     // simultaneously
     player.reset()
-    for (enemy in allEnemies) {
-        allEnemies[enemy].reset();
+    var enemies = allEnemies.length;
+    for (i = 0; i < enemies; i++) {
+        allEnemies[i].reset();
     }
     gameMultiply = 3;
     //allItems.length = 0;
     events.resetLevel();
-}
+};
 
 var nextLevel = function() {
-    resetLevel();
     // handles level progression
+    resetLevel();
     gameLevel++;
-    message.reset("level %".replace("%", gameLevel), "regular");
+    message.reset('level %'.replace('%', gameLevel), 'regular');
     
     // increment the number of enemies
     bug = new Enemy();
@@ -386,7 +391,7 @@ var nextLevel = function() {
     // bonus life every 10 levels
     if (gameLevel % 10 === 0) {
         player.lives++;
-        message.reset("level %, +1".replace("%", gameLevel), "regular");
+        message.reset('level %, +1'.replace('%', gameLevel), 'regular');
     }
 
     //append the level items
@@ -398,55 +403,56 @@ var nextLevel = function() {
     }
     //green gems
     for(i=3; i<gameLevel; i+=2) {
-        allItems.push(new GemGreen());   
+        allItems.push(new GemGreen());
     }
     //orange gems
     for(i=9; i<gameLevel; i+=3) {
-        allItems.push(new GemOrange());   
+        allItems.push(new GemOrange());
     }
-
     //rocks
     for(i=9; i<gameLevel; i+=4) {
-        allObstacles.push(new Rock());   
+        allObstacles.push(new Rock());
     }    
-}
+};
 
 var detectCollision = function(obj) {
     //container for actions executed with player collisions
+    //object agnostic
     //param: object invoking this method
     if (obj.y === player.y && Math.abs(player.x-obj.x) < 40) {
         //object has collided
-        if (obj.type === "enemy") {
+        //enemy collision
+        if (obj.type === 'enemy') {
             player.lives--;
             if (player.lives > 0) {
-                message.reset("wasted", "death");
-                resetLevel();            
+                message.reset('wasted', 'death');
+                resetLevel();
             }  else {
                 //if player lives less than 1 game is over
-                message.reset("game over", "end");
+                message.reset('game over', 'end');
                 player.reset();
                 setTimeout(resetGame, 2000);
             }        
-        } else if (obj.type === "heart") {
+        } else if (obj.type === 'heart') {
             player.lives++
             gameScore += (50 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
 
-        } else if (obj.type === "gem blue") {
+        } else if (obj.type === 'gem blue') {
             gameScore += (10 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
-        } else if (obj.type === "gem green") {
+        } else if (obj.type === 'gem green') {
             gameScore += (50 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
-        } else if (obj.type === "gem orange") {
+        } else if (obj.type === 'gem orange') {
             gameScore += (150 * gameLevel * gameMultiply);
             removeItem(allItems, obj);
-        } else if (obj.type === "rock") {
+        } else if (obj.type === 'rock') {
             player.x = player.x_last;
             player.y = player.y_last;
         }
     }    
-}
+};
 
 var removeItem = function(array, item) {
     //removes an item from an array
@@ -454,7 +460,7 @@ var removeItem = function(array, item) {
     if (index > -1) {
         array.splice(index, 1);
     }
-}
+};
 
 resetGame();
 

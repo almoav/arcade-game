@@ -6,7 +6,7 @@
  * A game engine works by drawing the entire game screen over and over, kind of
  * like a flipbook you may have created as a kid. When your player moves across
  * the screen, it may look like just that image/character is moving or being
- * drawn but that is not the case. What's really happening is the entire "scene"
+ * drawn but that is not the case. What's really happening is the entire 'scene'
  * is being drawn over and over, presenting the illusion of animation.
  *
  * This engine is available globally via the Engine variable and it also makes
@@ -31,10 +31,10 @@ var Engine = (function(global) {
     doc.body.appendChild(canvas);
 
     
-    //ctx.strokeStyle = "black";
+    //ctx.strokeStyle = 'black';
     ctx.lineWidth = 3;
-    ctx.font = "bold 36pt impact";
-    ctx.textAlign = "center";
+    ctx.font = 'bold 36pt impact';
+    ctx.textAlign = 'center';
 
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
@@ -100,7 +100,7 @@ var Engine = (function(global) {
             if (enemy.y === player.y) {
                 //console.log(player.x/this.x);
                 if (Math.abs(player.x-enemy.x) < 60) {
-                    console.log("collide");    
+                    console.log('collide');    
         }
         });       
     */
@@ -129,7 +129,7 @@ var Engine = (function(global) {
         events.update(dt);
     }
 
-    /* This function initially draws the "game level", it will then call
+    /* This function initially draws the 'game level', it will then call
      * the renderEntities function. Remember, this function is called every
      * game tick (or loop of the game engine) because that's how games work -
      * they are flipbooks creating the illusion of animation but in reality
@@ -139,7 +139,7 @@ var Engine = (function(global) {
         //fill bkg with white
         ctx.save();
 
-        ctx.fillStyle = "white";
+        ctx.fillStyle = 'white';
         ctx.fillRect(0,0,505,606);
 
 
@@ -161,11 +161,11 @@ var Engine = (function(global) {
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
+         * portion of the 'grid'
          */
 
         //switch between rendering start screen and game play
-        if (gameStatus == "run") {
+        if (gameStatus == 'run') {
             //render environment
             for (row = 0; row < numRows; row++) {
                 for (col = 0; col < numCols; col++) {
@@ -173,7 +173,7 @@ var Engine = (function(global) {
                 }
             }
             renderHud();
-            renderEntities();  
+            renderEntities();
 
         } else {
             // start menu
@@ -234,12 +234,12 @@ var Engine = (function(global) {
         
         ctx.save();
 
-        ctx.font = "16pt impact";
-        ctx.textAlign = "left";
-        ctx.fillStyle = "white";
-        ctx.strokeStyle = "black";
+        ctx.font = '16pt impact';
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
         ctx.shadowBlur = 5;
-        ctx.shadowColor = "#191919";
+        ctx.shadowColor = '#191919';
 
         
         //life
@@ -250,23 +250,23 @@ var Engine = (function(global) {
             };
         } else {
             ctx.drawImage(Resources.get('images/Heart.png'), 28, 15, 25, 40)
-            ctx.fillText("x%".replace("%", player.lives), 68, 45);
+            ctx.fillText('x%'.replace('%', player.lives), 68, 45);
         }
         
         //score
-        ctx.strokeText("score: %".replace("%", gameScore), 140, 45);
-        ctx.fillText("score: %".replace("%", gameScore), 140, 45);
-        ctx.strokeText("x: %".replace("%", gameMultiply), 320, 45);
-        ctx.fillText("x: %".replace("%", gameMultiply), 320, 45);
+        ctx.strokeText('score: %'.replace('%', gameScore), 140, 45);
+        ctx.fillText('score: %'.replace('%', gameScore), 140, 45);
+        ctx.strokeText('x: %'.replace('%', gameMultiply), 320, 45);
+        ctx.fillText('x: %'.replace('%', gameMultiply), 320, 45);
 
         //level
-        ctx.strokeText("level %".replace("%", gameLevel), 420, 45);
-        ctx.fillText("level %".replace("%", gameLevel), 420, 45);
+        ctx.strokeText('level %'.replace('%', gameLevel), 420, 45);
+        ctx.fillText('level %'.replace('%', gameLevel), 420, 45);
 
-        ctx.font = "12pt impact";
-        //ctx.shadowColor = "white";
-        ctx.strokeText("press q to quit", 10, 602);
-        ctx.fillText("press q to quit", 10, 602);
+        ctx.font = '12pt impact';
+        //ctx.shadowColor = 'white';
+        ctx.strokeText('press q to quit', 10, 602);
+        ctx.fillText('press q to quit', 10, 602);
 
         ctx.restore();
 
@@ -277,43 +277,43 @@ var Engine = (function(global) {
         ctx.save();
 
         //game title
-        ctx.font = "bold 48pt impact";
-        ctx.textAlign = "center";
+        ctx.font = 'bold 48pt impact';
+        ctx.textAlign = 'center';
         
         grad = ctx.createLinearGradient(0,120,0,160);
-        grad.addColorStop(.1, "#FFD980");
-        grad.addColorStop(.3, "white");
-        grad.addColorStop(.8, "#FFCC00");
+        grad.addColorStop(.1, '#FFD980');
+        grad.addColorStop(.3, 'white');
+        grad.addColorStop(.8, '#FFCC00');
         
         ctx.fillStyle = grad;
-        ctx.strokeStyle = "black 10px";
+        ctx.strokeStyle = 'black 10px';
         ctx.shadowBlur = 20;
-        ctx.shadowColor = "#191919";     
+        ctx.shadowColor = '#191919';
         
-        ctx.strokeText("Bug Force 5", 250, 160);
-        ctx.fillText("Bug Force 5", 250, 160);
+        ctx.strokeText('Bug Force 5', 250, 160);
+        ctx.fillText('Bug Force 5', 250, 160);
 
         ctx.restore(); 
 
-        ctx.font = "16pt impact";
-        ctx.textAlign = "center";
-        ctx.fillStyle = "#33CC33"; 
-        ctx.fillStyle = "#FF5050"
-        ctx.strokeStyle = "black 1px";
+        ctx.font = '16pt impact';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#33CC33';
+        ctx.fillStyle = '#FF5050'
+        ctx.strokeStyle = 'black 1px';
         ctx.shadowBlur = 10;
-        ctx.shadowColor = "#191919";
+        ctx.shadowColor = '#191919';
         
-        ctx.strokeText("top score: %".replace("%", topScore), 250, 195);
-        ctx.fillText("top score: %".replace("%", topScore), 250, 195);
-        ctx.strokeText("press [enter] to start", 250, 425);
-        ctx.fillText("press [enter] to start", 250, 425);      
+        ctx.strokeText('top score: %'.replace('%', topScore), 250, 195);
+        ctx.fillText('top score: %'.replace('%', topScore), 250, 195);
+        ctx.strokeText('press [enter] to start', 250, 425);
+        ctx.fillText('press [enter] to start', 250, 425);      
         
-        ctx.restore();              
+        ctx.restore();
     }
 
 
     function reset() {
-        //console.log("reset");
+        //console.log('reset');
     }
 
     /* Go ahead and load all of the images we know we're going to need to

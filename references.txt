@@ -8,3 +8,7 @@ http://blog.kevinchisholm.com/javascript/javascript-immediate-functions-basics/
 http://kakimotonline.com/2011/05/17/javascript-immetiate-object-initialization/
 
 http://stackoverflow.com/questions/16576983/replace-multiple-characters-in-one-replace-call
+
+http://stackoverflow.com/questions/5767325/remove-specific-element-from-an-array
+
+http://www.w3schools.com/tags/canvas_createlineargradient.asp
