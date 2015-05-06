@@ -16,7 +16,7 @@ Enemy.prototype.reset = function() {
     this.speed = (Math.random() + .5) * 200;
     this.x = (Math.random() * 500) - 150;
     this.y = (83 * this.row) -36;
-    this.move = true; 
+    this.move = true;
 };
 
 // Update the enemy's position, required method for game
@@ -24,7 +24,7 @@ Enemy.prototype.reset = function() {
 Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
-    // all computers. 
+    // all computers.
     if (this.move === true) {
         this.x += (dt * this.speed);
     }
@@ -44,7 +44,7 @@ Enemy.prototype.wrap = function() {
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     scale = 150;
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 96, scale);    
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 96, scale);
 };
 
 var Heart = function() {
@@ -62,7 +62,7 @@ Heart.prototype.constructor = Heart;
 Heart.prototype.render = function() {
     scale = 100;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 72, scale);
-    
+
 };
 
 Heart.prototype.wrap = function() {
@@ -82,7 +82,7 @@ GemBlue.prototype.constructor = GemBlue;
 GemBlue.prototype.render = function() {
     scale = 60;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 145-scale, 45, scale);
-    
+
 };
 
 var GemGreen = function() {
@@ -139,7 +139,7 @@ var Player = function() {
 Player.prototype.reset = function() {
     //place player back at start position
     this.x = 200;
-    this.y = (83 * 5) - 36;    
+    this.y = (83 * 5) - 36;
 };
 
 Player.prototype.update = function() {
@@ -152,7 +152,7 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);    
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 Player.prototype.handleInput = function(key) {
@@ -174,7 +174,7 @@ Player.prototype.handleInput = function(key) {
             resetGame();
         }
     }
-        
+
 };
 
 var Selector = function() {
@@ -222,7 +222,7 @@ Message.prototype.reset = function(msg, msgtype) {
     this.msg = msg;
     this.msgtype = msgtype;
 };
- 
+
 Message.prototype.render = function() {
     //render message to canvas
     //length to display
@@ -270,14 +270,14 @@ Message.prototype.render = function() {
             ctx.fillStyle = redFill;
             ctx.strokeStyle = 'rgba(0,0,0,%)'.replace('%', alpha);
         }
-        
+
         //text render
         ctx.shadowBlur = 10;
         ctx.shadowColor = '#191919';
         ctx.strokeText(this.msg, 250, 275);
         ctx.fillText(this.msg, 250, 275);
-        
-        
+
+
     } else {
         player.move = true;
     }
@@ -291,7 +291,7 @@ var Events = function() {
     this.levelStart = 0;
     this.gameElapsed = 0;
     this.levelElapsed = 0;
-    
+
     //countdown timers
     this.heartCD = 1000;
     this.multCD = 100;
@@ -308,7 +308,7 @@ Events.prototype.update = function(dt) {
         gameMultiply -= 0.25;
         this.multCD = 100;
     }
-    this.multCD--; 
+    this.multCD--;
 
     //start generating hearts based on time elapsed
     if (gameLevel > 5) {
@@ -325,8 +325,8 @@ Events.prototype.genHeart = function() {
         heart = new Heart();
         allItems.push(heart);
         this.heartCD = 1000;
-    }   
-    this.heartCD--; 
+    }
+    this.heartCD--;
 };
 
 // Now instantiate your objects.
@@ -353,14 +353,16 @@ var resetGame = function() {
 };
 
 var startGame = function() {
-    gameStatus = 'run';
-    events.start = Date.now();
-    nextLevel();
+    if (gameStatus != 'run') {
+        gameStatus = 'run';
+        events.start = Date.now();
+        nextLevel();
+    }
 };
 
 // level stuff
 var resetLevel = function() {
-    // convenience function for resetting enemies and player 
+    // convenience function for resetting enemies and player
     // simultaneously
     player.reset()
     var enemies = allEnemies.length;
@@ -377,7 +379,7 @@ var nextLevel = function() {
     resetLevel();
     gameLevel++;
     message.reset('level %'.replace('%', gameLevel), 'regular');
-    
+
     // increment the number of enemies
     bug = new Enemy();
     allEnemies.push(bug);
@@ -406,7 +408,7 @@ var nextLevel = function() {
     //rocks
     for(i=9; i<gameLevel; i+=4) {
         allObstacles.push(new Rock());
-    }    
+    }
 };
 
 var detectCollision = function(obj) {
@@ -426,7 +428,7 @@ var detectCollision = function(obj) {
                 message.reset('game over', 'end');
                 player.reset();
                 setTimeout(resetGame, 2000);
-            }        
+            }
         } else if (obj.type === 'heart') {
             player.lives++
             gameScore += (50 * gameLevel * gameMultiply);
@@ -445,7 +447,7 @@ var detectCollision = function(obj) {
             player.x = player.x_last;
             player.y = player.y_last;
         }
-    }    
+    }
 };
 
 var removeItem = function(array, item) {

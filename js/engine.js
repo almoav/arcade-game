@@ -297,7 +297,7 @@ var Engine = (function(global) {
         ctx.strokeText('top score: %'.replace('%', topScore), 250, 195);
         ctx.fillText('top score: %'.replace('%', topScore), 250, 195);
         ctx.strokeText('press [enter] to start', 250, 425);
-        ctx.fillText('press [enter] to start', 250, 425);      
+        ctx.fillText('press [enter] to start', 250, 425);
         
         ctx.restore();
     };
