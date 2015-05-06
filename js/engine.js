@@ -74,7 +74,7 @@ var Engine = (function(global) {
         reset();
         lastTime = Date.now();
         main();
-    }
+    };
 
     /* This function is called by main (our game loop) and itself calls all
      * of the functions which may need to update entity's data. Based on how
@@ -93,7 +93,7 @@ var Engine = (function(global) {
         // count the current frame
         //clock.timestep(dt);
         // checkCollisions();
-    }
+    };
     /*
     function checkCollisons();
          allEnemies.forEach(function(enemy) {
@@ -125,9 +125,8 @@ var Engine = (function(global) {
         });
         
         player.update();
-        message.update();
         events.update(dt);
-    }
+    };
 
     /* This function initially draws the 'game level', it will then call
      * the renderEntities function. Remember, this function is called every
@@ -186,20 +185,12 @@ var Engine = (function(global) {
             //render characters
             selector.render();
             for (image in charImages) {
-                ctx.drawImage(Resources.get(charImages[image]), image * 101, 83 * 3 - 30);
-                
+                ctx.drawImage(Resources.get(charImages[image]), image * 101, 83 * 3 - 30);  
             }
-
             renderStart();
-
-
         }
-
         ctx.restore();
-        
-
-        
-    }
+    };
 
     /* This function is called by the render function and is called on each game
      * tick. It's purpose is to then call the render functions you have defined
@@ -223,7 +214,7 @@ var Engine = (function(global) {
 
         player.render();
         message.render();
-    }
+    };
 
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
@@ -270,7 +261,7 @@ var Engine = (function(global) {
 
         ctx.restore();
 
-    }
+    };
 
     function renderStart() {
         // render start screen
@@ -309,12 +300,12 @@ var Engine = (function(global) {
         ctx.fillText('press [enter] to start', 250, 425);      
         
         ctx.restore();
-    }
+    };
 
 
     function reset() {
         //console.log('reset');
-    }
+    };
 
     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when

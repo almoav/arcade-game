@@ -17,7 +17,7 @@ Enemy.prototype.reset = function() {
     this.x = (Math.random() * 500) - 150;
     this.y = (83 * this.row) -36;
     this.move = true; 
-}
+};
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -32,20 +32,20 @@ Enemy.prototype.update = function(dt) {
     if (this.x > 500) {
         this.wrap();
     }
-}
+};
 
 Enemy.prototype.wrap = function() {
     //wrap the object back around when it goes off the right side
     this.x = (Math.random() * -450) - 50;
     this.row = Math.max(Math.round(Math.random() * 3), 1);
     this.y = (83 * this.row) -36;
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     scale = 150;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 96, scale);    
-}
+};
 
 var Heart = function() {
     //heart item player interacts with
@@ -63,11 +63,11 @@ Heart.prototype.render = function() {
     scale = 100;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 171-scale, 72, scale);
     
-}
+};
 
 Heart.prototype.wrap = function() {
     this.move = false;
-}
+};
 
 var GemBlue = function() {
     Enemy.call(this);
@@ -83,7 +83,7 @@ GemBlue.prototype.render = function() {
     scale = 60;
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y + 145-scale, 45, scale);
     
-}
+};
 
 var GemGreen = function() {
     GemBlue.call(this);
@@ -115,15 +115,15 @@ Rock.prototype.reset = function() {
     this.col = Math.round((Math.random() * 6));
     this.y = (83 * this.row) -36;
     this.x = 101 * this.col;
-}
+};
 
 Rock.prototype.update = function() {
     detectCollision(this);
-}
+};
 
 Rock.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -140,7 +140,7 @@ Player.prototype.reset = function() {
     //place player back at start position
     this.x = 200;
     this.y = (83 * 5) - 36;    
-}
+};
 
 Player.prototype.update = function() {
     if (this.y < 0) {
@@ -149,11 +149,11 @@ Player.prototype.update = function() {
         nextLevel();
         resetLevel();
     }
-}
+};
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);    
-}
+};
 
 Player.prototype.handleInput = function(key) {
     // takes player input and translates into player position
@@ -175,7 +175,7 @@ Player.prototype.handleInput = function(key) {
         }
     }
         
-}
+};
 
 var Selector = function() {
     //subclass of player used in start screen to select
@@ -191,8 +191,7 @@ var Selector = function() {
         'images/char-horn-girl.png',
         'images/char-pink-girl.png',
         'images/char-princess-girl.png'
-        ];
-
+        ]
 };
 
 Selector.prototype = Object.create(Player.prototype);
@@ -207,9 +206,8 @@ Selector.prototype.handleInput = function(key) {
         select =  this.x/101;
         player.sprite = this.charImages[select];
         startGame();
-
     }
-}
+};
 
 var Message = function() {
     //used for storing and displaying messages to the canvas
@@ -217,17 +215,13 @@ var Message = function() {
     this.reset('new game', 'regular');
 };
 
-Message.prototype.update = function() {
-    //Does nothing
-}
-
 Message.prototype.reset = function(msg, msgtype) {
     //starts a new message
     this.start = Date.now();
     this.count = 10;
     this.msg = msg;
     this.msgtype = msgtype;
-}
+};
  
 Message.prototype.render = function() {
     //render message to canvas
@@ -288,7 +282,7 @@ Message.prototype.render = function() {
         player.move = true;
     }
     message.count--;
-}
+};
 
 var Events = function() {
     //game events trigged by time
@@ -320,11 +314,11 @@ Events.prototype.update = function(dt) {
     if (gameLevel > 5) {
         this.genHeart();
     }
-}
+};
 
 Events.prototype.resetLevel = function() {
     this.levelStart = Date.now();
-}
+};
 
 Events.prototype.genHeart = function() {
     if (this.heartCD <= 0) {
@@ -333,7 +327,7 @@ Events.prototype.genHeart = function() {
         this.heartCD = 1000;
     }   
     this.heartCD--; 
-}
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
