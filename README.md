@@ -1,5 +1,7 @@
 frontend-nanodegree-arcade-game
 ===============================
+originally copied from:
+https://github.com/udacity/frontend-nanodegree-arcade-game
 
 TO PLAY:
 * open index.html in a web browser
